@@ -166,6 +166,7 @@ class DetectionModel(BaseModel):
     # YOLOv5 detection model
     # 
     def __init__(self, cfg='yolov5s.yaml', ch=3, nc=None, anchors=None):  # model, input channels, number of classes
+        # 加载配置文件
         super().__init__()
         if isinstance(cfg, dict):
             self.yaml = cfg  # model dict
@@ -173,28 +174,43 @@ class DetectionModel(BaseModel):
             import yaml  # for torch hub
             self.yaml_file = Path(cfg).name
             with open(cfg, encoding='ascii', errors='ignore') as f:
-                self.yaml = yaml.safe_load(f)  # model dict
+                self.yaml = yaml.safe_load(f)  # model dict python内置的字典格式
 
         # Define model
+        # 利用配置文件 搭建网络的每一层
+        # 先取出ch关键词的值 / 没有就取传进来的ch
         ch = self.yaml['ch'] = self.yaml.get('ch', ch)  # input channels
+        # 传进来的nc和yaml中的不一样 本函数中会覆盖掉，选用传进来的nc
         if nc and nc != self.yaml['nc']:
             LOGGER.info(f"Overriding model.yaml nc={self.yaml['nc']} with nc={nc}")
             self.yaml['nc'] = nc  # override yaml value
         if anchors:
             LOGGER.info(f'Overriding model.yaml anchors with anchors={anchors}')
             self.yaml['anchors'] = round(anchors)  # override yaml value
+        # 搭建网络的每一层
         self.model, self.save = parse_model(deepcopy(self.yaml), ch=[ch])  # model, savelist
+        # 每一个检测类复制名字
         self.names = [str(i) for i in range(self.yaml['nc'])]  # default names
+        # 加载yaml文件中的inplace关键字 没有返回True
         self.inplace = self.yaml.get('inplace', True)
 
         # Build strides, anchors
+        # 取出最后一层
         m = self.model[-1]  # Detect()
+        # 判断这个模块是不是(Detect, Segment)模块
         if isinstance(m, (Detect, Segment)):
+            # 新建一个256*256的空白
             s = 256  # 2x min stride
             m.inplace = self.inplace
             forward = lambda x: self.forward(x)[0] if isinstance(m, Segment) else self.forward(x)
+            # 通过前馈传播得出步长
             m.stride = torch.tensor([s / x.shape[-2] for x in forward(torch.zeros(1, ch, s, s))])  # forward
+            # 检验此时anchor顺序对不对
             check_anchor_order(m)
+            # 为什么此时要除 
+            # 因为原本的anchor是对原本的图片的处理(像素大小) 
+            # 但是这里在特征层上 图片经过放缩(缩小8倍) 
+            # 所以这里的anchor也要除相同的倍数 变换相同的大小
             m.anchors /= m.stride.view(-1, 1, 1)
             self.stride = m.stride
             self._initialize_biases()  # only run once
@@ -296,33 +312,43 @@ class ClassificationModel(BaseModel):
         # Create a YOLOv5 classification model from a *.yaml file
         self.model = None
 
-
+# ch是通道数 d是那个yaml文件
 def parse_model(d, ch):  # model_dict, input_channels(3)
     # Parse a YOLOv5 model.yaml dictionary
     LOGGER.info(f"\n{'':>3}{'from':>18}{'n':>3}{'params':>10}  {'module':<40}{'arguments':<30}")
+    # 分别取出关键字 赋值
     anchors, nc, gd, gw, act = d['anchors'], d['nc'], d['depth_multiple'], d['width_multiple'], d.get('activation')
     if act:
         Conv.default_act = eval(act)  # redefine default activation, i.e. Conv.default_act = nn.SiLU()
         LOGGER.info(f"{colorstr('activation:')} {act}")  # print
     na = (len(anchors[0]) // 2) if isinstance(anchors, list) else anchors  # number of anchors
-    no = na * (nc + 5)  # number of outputs = anchors * (classes + 5)
+    no = na * (nc + 5)  # number of outputs = anchors * (classes + 5) （检测框坐标信息+检测框中存在目标物的置信度）
 
+    # 网络中的层 是否要保存/即是否后续要传给某一层 
+    # c2是输出通道
     layers, save, c2 = [], [], ch[-1]  # layers, savelist, ch out
     for i, (f, n, m, args) in enumerate(d['backbone'] + d['head']):  # from, number, module, args
+        # 找到common中的这个model类 毕竟yaml中的model名只是字符串
         m = eval(m) if isinstance(m, str) else m  # eval strings
         for j, a in enumerate(args):
             with contextlib.suppress(NameError):
                 args[j] = eval(a) if isinstance(a, str) else a  # eval strings
 
+        # gd就是yaml中的深度倍数depth_multiple
         n = n_ = max(round(n * gd), 1) if n > 1 else n  # depth gain
+        # 判断m到底是什么结构的model
         if m in {
                 Conv, GhostConv, Bottleneck, GhostBottleneck, SPP, SPPF, DWConv, MixConv2d, Focus, CrossConv,
                 BottleneckCSP, C3, C3TR, C3SPP, C3Ghost, nn.ConvTranspose2d, DWConvTranspose2d, C3x}:
+            # 求出输入通道 输出通道
             c1, c2 = ch[f], args[0]
+            # 通道数对不上
             if c2 != no:  # if not output
                 c2 = make_divisible(c2 * gw, 8)
-
+            # 拼接args参数
+            # 原args的参数[输出通道, 卷积核尺寸, 卷积核步长, padding]
             args = [c1, c2, *args[1:]]
+
             if m in {BottleneckCSP, C3, C3TR, C3Ghost, C3x}:
                 args.insert(2, n)  # number of repeats
                 n = 1
@@ -344,6 +370,7 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
         else:
             c2 = ch[f]
 
+        # n>1 代表这一层中有多个卷积模块
         m_ = nn.Sequential(*(m(*args) for _ in range(n))) if n > 1 else m(*args)  # module
         t = str(m)[8:-2].replace('__main__.', '')  # module type
         np = sum(x.numel() for x in m_.parameters())  # number params
@@ -351,9 +378,12 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
         LOGGER.info(f'{i:>3}{str(f):>18}{n_:>3}{np:10.0f}  {t:<40}{str(args):<30}')  # print
         save.extend(x % i for x in ([f] if isinstance(f, int) else f) if x != -1)  # append to savelist
         layers.append(m_)
+        # 对于第0层
         if i == 0:
             ch = []
-        ch.append(c2)
+        ch.append(c2) # 在ch中添加输出通道
+        # 因为下一层需要用到上一层的输出通道大小
+    # 返回整个网络结构 需要保存特征的层的索引
     return nn.Sequential(*layers), sorted(save)
 
 

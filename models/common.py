@@ -152,7 +152,10 @@ class CrossConv(nn.Module):
     def forward(self, x):
         return x + self.cv2(self.cv1(x)) if self.add else self.cv2(self.cv1(x))
 
-
+# 作者将BottleneckCSP(瓶颈层)模块转变为了C3模块
+# 其结构作用基本相同均为CSP架构 
+# 只是在修正单元的选择上有所不同 
+# 其包含了3个标准卷积层以及多个Bottleneck模块（数量由配置文件.yaml的n和depth_multiple参数乘积决定）
 class C3(nn.Module):
     # CSP Bottleneck with 3 convolutions
     def __init__(self, c1, c2, n=1, shortcut=True, g=1, e=0.5):  # ch_in, ch_out, number, shortcut, groups, expansion

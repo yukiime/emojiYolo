@@ -2,8 +2,15 @@
 
 # Parameters
 nc: 8  # number of classes
+
+# number最后要乘depth multiple
+# args最后要乘channel multiple
 depth_multiple: 1.0  # model depth multiple
 width_multiple: 1.0  # layer channel multiple
+
+# 三个特征层级 低层 中层 高层
+# 每层定义三个anchor
+# 第一个是10*13 第二个16*30 第三个32*23
 anchors:
   - [10,13, 16,30, 33,23]  # P3/8
   - [30,61, 62,45, 59,119]  # P4/16
@@ -54,3 +61,4 @@ head:
 # 第二个数代表该层模块或者子模块重复次数/第二个参数是neck的个数
 # Upsample上采样
 # model定义在common上
+# 可能在把步长为2的卷积当池化层用
