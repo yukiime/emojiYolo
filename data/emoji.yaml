@@ -1,9 +1,9 @@
 
 # Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
-path: F:/yolov5/data/images  # dataset root dir
-train: F:/yolov5/data/train.txt  # train images (relative to 'path') 118287 images
-val: F:/yolov5/data/val.txt  # val images (relative to 'path') 5000 images
-test: F:/yolov5/data/test.txt  # 20288 of 40670 images
+path: F:/EmojiYoLo/data/images  # dataset root dir
+train: F:/EmojiYoLo/data/train.txt  
+val: F:/EmojiYoLo/data/val.txt  
+test: F:/EmojiYoLo/data/test.txt 
 
 # Classes
 nc: 8 

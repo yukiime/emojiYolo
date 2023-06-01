@@ -21,6 +21,10 @@ if str(ROOT) not in sys.path:
 if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
+from models.SimAM import SimAM
+from models.SEAttention import SEAttention
+from models.ShuffleAttention import ShuffleAttention
+from models.EfficientChannelAttention import ECA
 from models.common import *
 from models.experimental import *
 from utils.autoanchor import check_anchor_order
@@ -338,7 +342,7 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
         n = n_ = max(round(n * gd), 1) if n > 1 else n  # depth gain
         # 判断m到底是什么结构的model
         if m in {
-                Conv, GhostConv, Bottleneck, GhostBottleneck, SPP, SPPF, DWConv, MixConv2d, Focus, CrossConv,
+                Conv, GhostConv, Bottleneck, GhostBottleneck, SPP, SPPF, DWConv, MixConv2d, Focus, CrossConv,SEAttention,ECA,
                 BottleneckCSP, C3, C3TR, C3SPP, C3Ghost, nn.ConvTranspose2d, DWConvTranspose2d, C3x}:
             # 求出输入通道 输出通道
             c1, c2 = ch[f], args[0]
@@ -353,6 +357,10 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
                 args.insert(2, n)  # number of repeats
                 n = 1
         elif m is nn.BatchNorm2d:
+            args = [ch[f]]
+        # elif m is SEAttention:
+        #     args = [ch[f]]
+        elif m is ShuffleAttention:
             args = [ch[f]]
         elif m is Concat:
             c2 = sum(ch[x] for x in f)
