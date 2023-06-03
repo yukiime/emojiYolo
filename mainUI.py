@@ -202,7 +202,7 @@ class MainWindow(QMainWindow):
         QtWidgets.QMessageBox.information(self, u"ok", u"Model initialization succeeded")
         
     def emoji_adaptation(self, emoji_ints):
-        emoji_arr = ['😊','😭','😛','🤬','😐','✌️','👉','🖐️']
+        emoji_arr = ['😊','😭','😛','🤬','😐','✌️','👉','🖐️','⌚','🖊️','☕','😷','📱','🧴','🍔','🍟','🍕']
         emoji_str = ''
         for emoji_no in emoji_ints:
             emoji_str = emoji_str + emoji_arr[emoji_no]
@@ -338,7 +338,6 @@ class MainWindow(QMainWindow):
                     # 展示emoji
                     if emoji_ints:
                         temp = self.emoji_adaptation(emoji_ints)
-                        # temp = "Main emoji: " + str(emoji_ints[0]) + '😀'
                         self.ui.emoji.setText(temp)
                     else:
                         temp = "No emoji" + '🐱‍🐉'
@@ -619,7 +618,7 @@ class MainWindow(QMainWindow):
         file_path, _  = QFileDialog.getOpenFileName(self.ui.see_history, "history", "runs/detect/", file_filter)
         self.ui.emoji.setFont(QFont("Arial", 36, QFont.Bold))  # 设置字体和大小
         self.ui.emoji.setWordWrap(True)  # 设置多行文本
-        self.ui.emoji.setAlignment(Qt.AlignLeft)  # 设置居中对齐
+        self.ui.emoji.setAlignment(Qt.AlignLeft) 
         # 在标签中显示选择的图片路径
         self.ui.emoji.setText(f"history path:{file_path}")
         
@@ -660,6 +659,9 @@ class MainWindow(QMainWindow):
             self.timer_video.stop()
 
     def increase_conf_thres(self):
+        self.ui.emoji.setFont(QFont("Arial", 36, QFont.Bold))  # 设置字体和大小
+        self.ui.emoji.setAlignment(Qt.AlignLeft)  
+
         temp = self.conf_thres + tensor(0.05) 
         if(temp < 1.0):
             self.conf_thres = temp
@@ -671,6 +673,9 @@ class MainWindow(QMainWindow):
         self.ui.emoji.setText(s)
     
     def decrease_conf_thres(self):
+        self.ui.emoji.setFont(QFont("Arial", 36, QFont.Bold))  # 设置字体和大小
+        self.ui.emoji.setAlignment(Qt.AlignLeft)  
+
         temp = self.conf_thres - tensor(0.05) 
         if(temp > 0):
             self.conf_thres = temp
@@ -682,6 +687,9 @@ class MainWindow(QMainWindow):
         self.ui.emoji.setText(s)
 
     def increase_iou_thres(self):
+        self.ui.emoji.setFont(QFont("Arial", 36, QFont.Bold))  # 设置字体和大小
+        self.ui.emoji.setAlignment(Qt.AlignLeft)  
+
         temp = float(self.iou_thres) + tensor(0.05) 
         if(temp < 1.0):
             self.iou_thres = temp
@@ -693,6 +701,9 @@ class MainWindow(QMainWindow):
         self.ui.emoji.setText(s)
     
     def decrease_iou_thres(self):
+        self.ui.emoji.setFont(QFont("Arial", 36, QFont.Bold))  # 设置字体和大小
+        self.ui.emoji.setAlignment(Qt.AlignLeft)  
+
         temp = float(self.iou_thres) - tensor(0.05) 
         if(temp > 0):
             self.iou_thres = temp

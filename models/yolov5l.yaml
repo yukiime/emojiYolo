@@ -1,7 +1,7 @@
 # YOLOv5 🚀 by Ultralytics, AGPL-3.0 license
 
 # Parameters
-nc: 8  # number of classes
+nc: 17  # number of classes
 
 # number最后要乘depth multiple
 # args最后要乘channel multiple

@@ -6,7 +6,7 @@ val: F:/EmojiYoLo/data/val.txt
 test: F:/EmojiYoLo/data/test.txt 
 
 # Classes
-nc: 8 
+nc: 17
 
 # Classes
 names:
@@ -18,7 +18,15 @@ names:
   5: Victory
   6: Pointing
   7: Splayed
-
+  8: Watch
+  9: Pen
+  10: Coffee
+  11: Mask
+  12: Phone
+  13: Bottle
+  14: Hamburger
+  15: Chips
+  16: Pizza
 
 
 

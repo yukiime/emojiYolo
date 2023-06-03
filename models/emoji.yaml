@@ -1,7 +1,7 @@
 # YOLOv5 🚀 by Ultralytics, AGPL-3.0 license
 
 # Parameters
-nc: 8  # number of classes
+nc: 17  # number of classes
 
 # number最后要乘depth multiple
 # args最后要乘channel multiple
@@ -62,8 +62,6 @@ head:
 
    [[22, 25, 28], 1, Detect, [nc, anchors]],  # Detect(P3, P4, P5)
   ]
-
-#  [-1, 1, SimAM, [16]] # 13
   
 # 共30层 每层四个结构
 # -1代表从上一层到达
