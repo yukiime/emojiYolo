@@ -10,23 +10,23 @@ nc: 17
 
 # Classes
 names:
-  0: Smiley
-  1: Crying
-  2: Tongue
-  3: Enraged
-  4: Neutral
-  5: Victory
-  6: Pointing
-  7: Splayed
-  8: Watch
-  9: Pen
-  10: Coffee
-  11: Mask
-  12: Phone
-  13: Bottle
-  14: Hamburger
-  15: Chips
-  16: Pizza
+  0: Smiley         # 笑
+  1: Crying         # 哭
+  2: Tongue         # 吐舌头           
+  3: Enraged        # 愤怒
+  4: Neutral        # 自然脸
+  5: Victory        # 胜利手势/比耶
+  6: Pointing       # 手指伸出/指向
+  7: Splayed        # 五指张开
+  8: Watch          # 手表
+  9: Pen            # 笔
+  10: Coffee        # 咖啡
+  11: Mask          # 口罩
+  12: Phone         # 手机
+  13: Bottle        # 瓶子/水瓶
+  14: Hamburger     # 汉堡
+  15: Chips         # 薯条
+  16: Pizza         # 披萨
 
 
 
