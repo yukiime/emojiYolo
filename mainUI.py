@@ -21,7 +21,7 @@ from utils.general import (Profile, check_img_size, check_imshow, cv2, increment
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device
 from models.common import DetectMultiBackend
-from ui.emoji_ui_0524 import Ui_MainWindow
+from ui.emoji_ui import Ui_MainWindow
 
 
 class MainWindow(QMainWindow):
